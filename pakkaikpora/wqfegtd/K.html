@@ -1,11 +1,123 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <h1>swarooppranav1</h1>
-  </body>
-</html>
+document.addEventListener('DOMContentLoaded', function() {
+    const mainImage = document.getElementById('main-image');
+    const thumbnailsContainer = document.getElementById('thumbnails');
+    const vendorElement = document.getElementById('vendor');
+    const titleElement = document.getElementById('title');
+    const currentPriceElement = document.getElementById('current-price');
+    const compareAtPriceElement = document.getElementById('compare-at-price');
+    const percentOffElement = document.getElementById('percent-off');
+    const colorSelector = document.getElementById('color');
+    const sizeSelector = document.getElementById('size');
+    const quantitySelector = document.getElementById('quantity');
+    const addToCartButton = document.getElementById('add-to-cart');
+    const cartMessage = document.getElementById('cart-message');
+    const descriptionElement = document.getElementById('description');
+
+    // Sample product data (replace with actual data if fetching dynamically)
+    const product = {
+        vendor: "Marmeto",
+        title: "Embrace Sideboard",
+        price: "$12999",
+        compare_at_price: "$19999",
+        description: "<p>The Embrace Sideboard is a stylish wear. With a top cloth designed to provide superior protection and look great, this storage solution is both functional and attractive. It fits seamlessly into any home decor, with clean lines and a timeless look. Crafted from premium materials for a combination of style, durability, and reliability.</p>",
+        images: [
+            "./img5.png",
+            "./img2.png",
+            "./img3.png",
+            "./img4.png"
+        ],
+        options: {
+            colors: [
+                { name: "Yellow", value: "#ECDECC" },
+                { name: "Green", value: "#BBD278" },
+                { name: "Blue", value: "#BBC1F8" },
+                { name: "Pink", value: "#FFD3F8" }
+            ],
+            sizes: ["Small", "Medium", "Large", "Extra large", "XXL"]
+        }
+    };
+
+    // Set initial main image
+    mainImage.src = product.images[0];
+    mainImage.alt = product.title;
+
+    // Set vendor and title
+    vendorElement.textContent = product.vendor;
+    titleElement.textContent = product.title;
+
+    // Set prices
+    currentPriceElement.textContent = product.price;
+    compareAtPriceElement.textContent = product.compare_at_price;
+    percentOffElement.textContent = calculatePercentOff(product.compare_at_price, product.price) + "% off";
+
+    // Set color options
+    product.options.colors.forEach(color => {
+        const option = document.createElement('option');
+        option.value = color.value;
+        option.textContent = color.name;
+        colorSelector.appendChild(option);
+    });
+
+    // Set size options
+    product.options.sizes.forEach(size => {
+        const option = document.createElement('option');
+        option.value = size;
+        option.textContent = size;
+        sizeSelector.appendChild(option);
+    });
+
+    // Set description
+    descriptionElement.innerHTML = product.description;
+
+    // Calculate and display percentage off
+    function calculatePercentOff(compareAt, current) {
+        return Math.round(((parseFloat(compareAt.slice(1)) - parseFloat(current.slice(1))) / parseFloat(compareAt.slice(1))) * 100);
+    }
+
+    // Handle add to cart button click
+    addToCartButton.addEventListener('click', function() {
+        const selectedColor = colorSelector.options[colorSelector.selectedIndex].textContent;
+        const selectedSize = sizeSelector.options[sizeSelector.selectedIndex].textContent;
+        const selectedQuantity = quantitySelector.value;
+
+        cartMessage.innerHTML = `
+            <p>Added to Cart:</p>
+            <p>Product: ${product.title}</p>
+            <p>Color: ${selectedColor}</p>
+            <p>Size: ${selectedSize}</p>
+            <p>Quantity: ${selectedQuantity}</p>
+        `;
+        cartMessage.style.display = 'block';
+    });
+
+    // Event listener for main image click to show thumbnails
+    mainImage.addEventListener('click', function() {
+        loadThumbnails();
+        // Remove the click event listener after it's clicked once
+        mainImage.removeEventListener('click', loadThumbnails);
+    });
+
+    // Function to load thumbnails (excluding the first image)
+    function loadThumbnails() {
+        thumbnailsContainer.innerHTML = '';
+        product.images.forEach((image, index) => {
+            const thumbnail = document.createElement('img');
+            thumbnail.src = image;
+            thumbnail.className = 'thumbnail';
+            thumbnail.alt = 'Thumbnail ' + (index + 1);
+            thumbnail.addEventListener('click', () => {
+                mainImage.src = image;
+            });
+            thumbnailsContainer.appendChild(thumbnail);
+
+            // Set custom size for the second image
+            if (image === './img2.png' || './img4.png' || image === './img5.png' || image === './img3.png') {
+                thumbnail.style.width = '250px';
+                thumbnail.style.height = '250px';
+            } else {
+                thumbnail.style.width = '100px';
+                thumbnail.style.height = '100px';
+            }
+        });
+    }
+});
